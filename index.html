@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#f7f5f0">
+<title>수업 자료실</title>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&family=Nanum+Myeongjo:wght@400;700;800&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<style>
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{background:#f7f5f0;color:#23211c;font-family:'Noto Sans KR',system-ui,sans-serif;-webkit-text-size-adjust:100%;overscroll-behavior:none}
+a{color:oklch(.5 .13 58)}
+a:hover{color:oklch(.42 .13 58)}
+button{font-family:inherit;border:none;background:none;padding:0;color:inherit;cursor:pointer}
+#목차{max-width:560px;margin:0 auto;padding:22px 16px calc(34px + env(safe-area-inset-bottom))}
+.머리{padding:6px 4px 18px}
+.수업명{font:800 27px/1.25 'Nanum Myeongjo',serif}
+.선생{font:400 13px/1 'Noto Sans KR';color:#8b8578;margin-top:9px}
+.공지{background:oklch(.96 .03 78);border:1px solid oklch(.86 .06 74);border-radius:14px;padding:14px 16px;display:flex;gap:11px;align-items:flex-start;margin-bottom:16px}
+.공지 i{width:7px;height:7px;border-radius:50%;background:oklch(.58 .13 58);flex:none;margin-top:7px}
+.공지 b{display:block;font:500 10.5px/1 'Noto Sans KR';color:oklch(.5 .1 58);letter-spacing:.06em}
+.공지 p{margin:5px 0 0;font:500 14px/1.6 'Noto Sans KR'}
+.대{border-bottom:1px solid #eae5da}
+.대줄{width:100%;display:flex;align-items:baseline;gap:13px;padding:16px 4px;text-align:left}
+.대번호{font:700 15px/1 'Nanum Myeongjo',serif;color:#b8b1a2;flex:none;min-width:24px}
+.대제목{font:400 16px/1.35 'Noto Sans KR';flex:1}
+.개수{font:400 12px/1 'Noto Sans KR';color:#a8a294;flex:none}
+.대.열림{background:#fffefb;border:1px solid #e6e1d6;border-radius:16px;margin:10px 0;overflow:hidden}
+.대.열림 .대줄{background:#23211c;color:#f7f5f0;padding:16px 16px}
+.대.열림 .대번호{color:rgba(247,245,240,.55)}
+.대.열림 .개수{color:rgba(247,245,240,.55)}
+.속{padding:14px 16px 18px;display:flex;flex-direction:column;gap:18px}
+.중제목{display:flex;align-items:baseline;gap:10px;font:500 14.5px/1.35 'Noto Sans KR'}
+.중번호{font:700 12.5px/1 'Nanum Myeongjo',serif;color:#b8b1a2;flex:none}
+.소{padding-left:12px;border-left:2px solid #f0ece3;margin-top:11px;display:flex;flex-direction:column;gap:11px}
+.소제목{font:400 12.5px/1.4 'Noto Sans KR';color:#8b8578}
+.차시{display:flex;flex-direction:column;gap:10px;padding-top:4px}
+.차시제목{font:500 14px/1.4 'Noto Sans KR';color:#23211c}
+.미리{position:relative;border:1px solid #e6e1d6;border-radius:11px;overflow:hidden;background:#fffefb;height:158px;width:100%;padding:0;display:block}
+.미리 canvas{width:100%;display:block}
+.미리 span{position:absolute;left:0;right:0;bottom:0;padding:9px 11px;background:linear-gradient(rgba(35,33,28,0),rgba(35,33,28,.85));color:#f7f5f0;font:500 11px/1 'Noto Sans KR';text-align:right}
+.자료{display:flex;align-items:center;gap:11px}
+.도형{width:20px;height:25px;border:1.5px solid #57534a;border-radius:3px;flex:none}
+.자료 .이름{flex:1;min-width:0}
+.자료 .이름 b{display:block;font:400 13.5px/1.4 'Noto Sans KR';font-weight:400}
+.자료 .이름 i{display:block;font:400 11.5px/1 'Noto Sans KR';color:#8b8578;font-style:normal;margin-top:4px}
+.버튼{flex:none;font:500 11.5px/1 'Noto Sans KR';border-radius:20px;padding:9px 13px;white-space:nowrap}
+.받기{background:oklch(.58 .13 58);color:#fffefb}
+.중{background:transparent;border:1px solid #e6e1d6;color:#8b8578}
+.열기{border:1.5px solid #23211c;color:#23211c;display:flex;align-items:center;gap:6px}
+.열기 em{width:5px;height:5px;border-radius:50%;background:oklch(.55 .11 152);display:block}
+.빈{font:400 12.5px/1.6 'Noto Sans KR';color:#c6bfae;padding:20px 4px;text-align:center}
+/* 뷰어 */
+#뷰어{position:fixed;inset:0;background:#3a372f;display:none;flex-direction:column;z-index:20}
+#뷰어.on{display:flex}
+.뷰머리{background:#23211c;color:#f7f5f0;padding:calc(11px + env(safe-area-inset-top)) 14px 11px;display:flex;align-items:center;gap:11px;flex:none}
+.뒤로{font:400 21px/.7 'Noto Sans KR';opacity:.85;padding:4px 2px}
+.뷰제목{flex:1;min-width:0}
+.뷰제목 b{display:block;font:500 14px/1.25 'Noto Sans KR';white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:500}
+.뷰제목 i{display:block;font:400 10.5px/1 'Noto Sans KR';opacity:.6;font-style:normal;margin-top:5px}
+.필기토글{flex:none;font:500 10.5px/1 'Noto Sans KR';border:1px solid rgba(247,245,240,.35);border-radius:20px;padding:8px 10px}
+.필기토글.켬{background:#f7f5f0;color:#23211c;border-color:#f7f5f0}
+#지면{flex:1;min-height:0;overflow:auto;-webkit-overflow-scrolling:touch;padding:10px;display:flex;justify-content:center}
+#지면.잠금{overflow:hidden}
+#싸개{position:relative;background:#fffefb;box-shadow:0 4px 16px rgba(0,0,0,.32);align-self:flex-start}
+#지면canvas,#필기canvas{display:block}
+#필기canvas{position:absolute;inset:0;touch-action:none}
+.도구{background:#fffefb;padding:11px 12px calc(15px + env(safe-area-inset-bottom));display:flex;align-items:center;gap:8px;flex:none;border-top:1px solid #e6e1d6}
+.도구 button{width:42px;height:42px;border-radius:12px;border:1.5px solid #e6e1d6;display:flex;align-items:center;justify-content:center;font:500 11px/1 'Noto Sans KR';color:#57534a}
+.도구 button.on{background:#23211c;border-color:#23211c;color:#f7f5f0}
+.쪽{margin-left:auto;display:flex;align-items:center;gap:9px;font:500 12px/1 'Noto Sans KR';color:#57534a}
+.쪽 button{width:36px;height:36px;border-radius:10px}
+.쪽 button:disabled{opacity:.3}
+#로딩{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font:400 13px/1 'Noto Sans KR';color:#dcd6c8}
+.안내{font:400 12px/1.8 'Noto Sans KR';color:#8b8578;text-align:center;padding:26px 10px 0;border-top:1px solid #eae5da;margin-top:22px}
+</style>
+</head>
+<body>
+
+<div id="목차">
+  <div class="머리">
+    <div class="수업명" id="수업명"></div>
+    <div class="선생" id="선생"></div>
+  </div>
+  <div id="공지자리"></div>
+  <div id="단원자리"></div>
+  <div class="안내">필기는 이 기기에만 저장됩니다.<br>중요한 내용은 사진으로도 남겨두세요.</div>
+</div>
+
+<div id="뷰어">
+  <div class="뷰머리">
+    <button class="뒤로" id="닫기">‹</button>
+    <div class="뷰제목"><b id="뷰제목"></b><i id="뷰상태">읽기 중 · 넘겨서 보기</i></div>
+    <button class="필기토글" id="필기토글">필기 끔</button>
+  </div>
+  <div id="지면"><div id="싸개"><canvas id="지면canvas"></canvas><canvas id="필기canvas"></canvas></div><div id="로딩">불러오는 중…</div></div>
+  <div class="도구">
+    <button data-도구="펜" class="on">펜</button>
+    <button data-도구="형광">형광</button>
+    <button data-도구="지우개">지우개</button>
+    <button id="되돌리기">↺</button>
+    <div class="쪽"><button id="이전">‹</button><span id="쪽수">1 / 1</span><button id="다음">›</button></div>
+  </div>
+</div>
+
+<script src="자료목록.js"></script>
+<script>
+pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+const 받은파일 = new Map();
+const $ = s => document.querySelector(s);
+const 보임 = x => x.공개 !== false;
+/* 차시 단계가 없는 예전 구조도 그대로 읽습니다 */
+const 차시목록 = 소 => 소.차시 && 소.차시.length ? 소.차시 : (소.자료 && 소.자료.length ? [{ 자료: 소.자료 }] : []);
+
+/* ── 목차 그리기 ── */
+document.title = 수업자료.수업이름 + ' 자료실';
+$('#수업명').textContent = 수업자료.수업이름;
+$('#선생').textContent = 수업자료.선생님;
+
+if (수업자료.공지) {
+  $('#공지자리').innerHTML =
+    '<div class="공지"><i></i><div><b>공지</b><p></p></div></div>';
+  $('#공지자리 p').textContent = 수업자료.공지;
+}
+
+const 자리 = $('#단원자리');
+const 대단원들 = (수업자료.단원 || []).filter(보임);
+
+if (!대단원들.length) {
+  자리.innerHTML = '<div class="빈">아직 공개된 단원이 없습니다.</div>';
+}
+
+대단원들.forEach((대, i) => {
+  const 중들 = (대.중단원 || []).filter(보임);
+  let 총 = 0;
+  중들.forEach(중 => (중.소단원 || []).filter(보임).forEach(소 => 차시목록(소).forEach(차 => 총 += (차.자료 || []).length)));
+
+  const box = document.createElement('div');
+  box.className = '대';
+  const 줄 = document.createElement('button');
+  줄.className = '대줄';
+  줄.innerHTML = '<span class="대번호"></span><span class="대제목"></span><span class="개수"></span>';
+  줄.querySelector('.대번호').textContent = 대.번호 || '';
+  줄.querySelector('.대제목').textContent = 대.제목 || '';
+  줄.querySelector('.개수').textContent = 총 ? '자료 ' + 총 : '준비 중';
+  box.appendChild(줄);
+
+  const 속 = document.createElement('div');
+  속.className = '속';
+  속.style.display = 'none';
+
+  중들.forEach(중 => {
+    const 중칸 = document.createElement('div');
+    const 중제 = document.createElement('div');
+    중제.className = '중제목';
+    중제.innerHTML = '<span class="중번호"></span><span></span>';
+    중제.querySelector('.중번호').textContent = 중.번호 || '';
+    중제.lastChild.textContent = 중.제목 || '';
+    중칸.appendChild(중제);
+
+    (중.소단원 || []).filter(보임).forEach(소 => {
+      const 소칸 = document.createElement('div');
+      소칸.className = '소';
+      const 소제 = document.createElement('div');
+      소제.className = '소제목';
+      소제.textContent = (소.번호 ? 소.번호 + ' ' : '') + (소.제목 || '');
+      소칸.appendChild(소제);
+
+      const 차시들 = 차시목록(소).filter(보임);
+      if (!차시들.length) {
+        const p = document.createElement('div');
+        p.className = '소제목';
+        p.style.color = '#c6bfae';
+        p.textContent = '자료 준비 중';
+        소칸.appendChild(p);
+      }
+      차시들.forEach(차 => {
+        const 차칸 = document.createElement('div');
+        차칸.className = '차시';
+        if (차.제목 || 차.번호) {
+          const t = document.createElement('div');
+          t.className = '차시제목';
+          t.textContent = (차.번호 ? 차.번호 + ' ' : '') + (차.제목 || '');
+          차칸.appendChild(t);
+        }
+        const 자료들 = 차.자료 || [];
+        if (자료들[0]) 차칸.appendChild(미리보기만들기(자료들[0]));
+        자료들.forEach(자 => 차칸.appendChild(자료줄만들기(자)));
+        if (!자료들.length) {
+          const p = document.createElement('div');
+          p.className = '소제목';
+          p.style.color = '#c6bfae';
+          p.textContent = '자료 준비 중';
+          차칸.appendChild(p);
+        }
+        소칸.appendChild(차칸);
+      });
+      중칸.appendChild(소칸);
+    });
+    속.appendChild(중칸);
+  });
+
+  box.appendChild(속);
+  줄.onclick = () => {
+    const 열림 = box.classList.toggle('열림');
+    속.style.display = 열림 ? 'flex' : 'none';
+  };
+  if (i === 0) 줄.onclick();
+  자리.appendChild(box);
+});
+
+/* ── 자료 한 줄 ── */
+function 자료줄만들기(자) {
+  const el = document.createElement('div');
+  el.className = '자료';
+  el.innerHTML = '<span class="도형"></span><span class="이름"><b></b><i></i></span>';
+  el.querySelector('b').textContent = 자.제목 || '';
+  el.querySelector('i').textContent = 자.설명 || 'PDF';
+
+  const 단 = document.createElement('button');
+  단.className = '버튼 받기';
+  단.textContent = '받기';
+  el.appendChild(단);
+
+  단.onclick = async () => {
+    if (받은파일.has(자.파일)) return 뷰어열기(자);
+    단.className = '버튼 중';
+    단.textContent = '받는 중…';
+    try {
+      const r = await fetch(자.파일);
+      if (!r.ok) throw 0;
+      받은파일.set(자.파일, await r.arrayBuffer());
+      단.className = '버튼 열기';
+      단.innerHTML = '<em></em>열기';
+      단.onclick = () => 뷰어열기(자);
+    } catch (e) {
+      단.className = '버튼 중';
+      단.textContent = '실패 · 다시';
+      단.onclick = () => location.reload();
+    }
+  };
+  return el;
+}
+
+/* ── 첫 장 미리보기 ── */
+function 미리보기만들기(자) {
+  const b = document.createElement('button');
+  b.className = '미리';
+  b.innerHTML = '<canvas></canvas><span>크게 보기</span>';
+  b.onclick = () => 뷰어열기(자);
+  pdfjsLib.getDocument(자.파일).promise.then(doc => doc.getPage(1)).then(p => {
+    const c = b.querySelector('canvas');
+    const v0 = p.getViewport({ scale: 1 });
+    const s = 520 / v0.width;
+    const v = p.getViewport({ scale: s });
+    c.width = v.width; c.height = v.height;
+    p.render({ canvasContext: c.getContext('2d'), viewport: v });
+  }).catch(() => b.remove());
+  return b;
+}
+
+/* ── 뷰어 ── */
+let 문서 = null, 쪽 = 1, 총쪽 = 1, 지금파일 = '', 도구 = '펜', 필기중 = false;
+let 획들 = [], 그리는중 = null;
+
+const 뷰 = $('#뷰어'), 지면 = $('#지면'), 싸개 = $('#싸개');
+const cPdf = $('#지면canvas'), cInk = $('#필기canvas'), gInk = cInk.getContext('2d');
+
+async function 뷰어열기(자) {
+  뷰.classList.add('on');
+  document.body.style.overflow = 'hidden';
+  $('#뷰제목').textContent = 자.제목 || '';
+  $('#로딩').style.display = 'flex';
+  지금파일 = 자.파일; 쪽 = 1;
+  const 원본 = 받은파일.get(자.파일);
+  문서 = await pdfjsLib.getDocument(원본 ? { data: 원본.slice(0) } : 자.파일).promise;
+  총쪽 = 문서.numPages;
+  await 쪽그리기();
+  $('#로딩').style.display = 'none';
+}
+
+async function 쪽그리기() {
+  const p = await 문서.getPage(쪽);
+  const 폭 = Math.min(지면.clientWidth - 20, 900);
+  const v0 = p.getViewport({ scale: 1 });
+  const v = p.getViewport({ scale: 폭 / v0.width });
+  [cPdf, cInk].forEach(c => { c.width = v.width; c.height = v.height; });
+  싸개.style.width = v.width + 'px';
+  await p.render({ canvasContext: cPdf.getContext('2d'), viewport: v }).promise;
+  획들 = 불러오기();
+  다시칠하기();
+  $('#쪽수').textContent = 쪽 + ' / ' + 총쪽;
+  $('#이전').disabled = 쪽 <= 1;
+  $('#다음').disabled = 쪽 >= 총쪽;
+  지면.scrollTop = 0;
+}
+
+const 열쇠 = () => '필기:' + 지금파일 + ':' + 쪽;
+function 저장하기() { try { localStorage.setItem(열쇠(), JSON.stringify(획들)); } catch (e) {} }
+function 불러오기() { try { return JSON.parse(localStorage.getItem(열쇠()) || '[]'); } catch (e) { return []; } }
+
+function 칠하기(획) {
+  if (!획.점.length) return;
+  gInk.save();
+  gInk.lineCap = 'round'; gInk.lineJoin = 'round';
+  const 배 = cInk.width / 1000;
+  if (획.도구 === '지우개') { gInk.globalCompositeOperation = 'destination-out'; gInk.lineWidth = 26 * 배; }
+  else if (획.도구 === '형광') { gInk.strokeStyle = 'rgba(240,190,60,.42)'; gInk.lineWidth = 20 * 배; }
+  else { gInk.strokeStyle = '#1b3a6b'; gInk.lineWidth = 3 * 배; }
+  gInk.beginPath();
+  gInk.moveTo(획.점[0][0] * cInk.width, 획.점[0][1] * cInk.height);
+  획.점.forEach(pt => gInk.lineTo(pt[0] * cInk.width, pt[1] * cInk.height));
+  gInk.stroke();
+  gInk.restore();
+}
+function 다시칠하기() { gInk.clearRect(0, 0, cInk.width, cInk.height); 획들.forEach(칠하기); }
+
+function 좌표(e) {
+  const r = cInk.getBoundingClientRect();
+  return [(e.clientX - r.left) / r.width, (e.clientY - r.top) / r.height];
+}
+cInk.addEventListener('pointerdown', e => {
+  if (!필기중) return;
+  cInk.setPointerCapture(e.pointerId);
+  그리는중 = { 도구, 점: [좌표(e)] };
+  획들.push(그리는중);
+});
+cInk.addEventListener('pointermove', e => {
+  if (!그리는중) return;
+  그리는중.점.push(좌표(e));
+  칠하기(그리는중);
+});
+['pointerup', 'pointerleave', 'pointercancel'].forEach(n =>
+  cInk.addEventListener(n, () => { if (그리는중) { 그리는중 = null; 저장하기(); } }));
+
+$('#필기토글').onclick = () => {
+  필기중 = !필기중;
+  const b = $('#필기토글');
+  b.classList.toggle('켬', 필기중);
+  b.textContent = 필기중 ? '필기 켬' : '필기 끔';
+  cInk.style.pointerEvents = 필기중 ? 'auto' : 'none';
+  지면.classList.toggle('잠금', 필기중);
+  $('#뷰상태').textContent = 필기중 ? '필기 중 · 이 기기에 저장됩니다' : '읽기 중 · 넘겨서 보기';
+};
+cInk.style.pointerEvents = 'none';
+
+document.querySelectorAll('[data-도구]').forEach(b => b.onclick = () => {
+  document.querySelectorAll('[data-도구]').forEach(x => x.classList.remove('on'));
+  b.classList.add('on');
+  도구 = b.dataset.도구;
+  if (!필기중) $('#필기토글').onclick();
+});
+$('#되돌리기').onclick = () => { 획들.pop(); 다시칠하기(); 저장하기(); };
+$('#이전').onclick = () => { if (쪽 > 1) { 쪽--; 쪽그리기(); } };
+$('#다음').onclick = () => { if (쪽 < 총쪽) { 쪽++; 쪽그리기(); } };
+$('#닫기').onclick = () => { 뷰.classList.remove('on'); document.body.style.overflow = ''; };
+
+let 늦게;
+addEventListener('resize', () => { clearTimeout(늦게); if (문서) 늦게 = setTimeout(쪽그리기, 250); });
+</script>
+</body>
+</html>
