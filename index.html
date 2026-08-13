@@ -76,6 +76,37 @@ button{font-family:inherit;border:none;background:none;padding:0;color:inherit;c
 .쪽 button:disabled{opacity:.3}
 #로딩{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font:400 13px/1 'Noto Sans KR';color:#dcd6c8}
 .안내{font:400 12px/1.8 'Noto Sans KR';color:#8b8578;text-align:center;padding:26px 10px 0;border-top:1px solid #eae5da;margin-top:22px}
+/* 태블릿 — 화면이 넓어지면 본문 폭과 글자를 함께 키웁니다 */
+@media (min-width:760px){
+  #목차{max-width:780px;padding:34px 26px calc(44px + env(safe-area-inset-bottom))}
+  .수업명{font-size:35px}
+  .선생{font-size:15px}
+  .공지{padding:18px 20px;border-radius:16px}
+  .공지 p{font-size:16.5px}
+  .대줄{padding:20px 6px}
+  .대번호{font-size:18px;min-width:30px}
+  .대제목{font-size:20px}
+  .개수{font-size:14px}
+  .속{padding:18px 20px 24px;gap:22px}
+  .중제목{font-size:17.5px}
+  .중번호{font-size:15px}
+  .소제목{font-size:14.5px}
+  .차시제목{font-size:17px}
+  .미리{height:250px}
+  .미리 span{font-size:13px;padding:11px 14px}
+  .자료{gap:14px}
+  .도형{width:24px;height:30px}
+  .자료 .이름 b{font-size:16px}
+  .자료 .이름 i{font-size:13px}
+  .버튼{font-size:13.5px;padding:12px 18px}
+  .안내{font-size:14px}
+  .뷰제목 b{font-size:17px}
+  .뷰제목 i{font-size:12.5px}
+  .필기토글{font-size:13px;padding:11px 15px}
+  .도구 button{width:52px;height:52px;font-size:13px}
+  .쪽{font-size:14px}
+  .쪽 button{width:44px;height:44px}
+}
 </style>
 </head>
 <body>
@@ -255,9 +286,10 @@ function 미리보기만들기(자) {
   pdfjsLib.getDocument(자.파일).promise.then(doc => doc.getPage(1)).then(p => {
     const c = b.querySelector('canvas');
     const v0 = p.getViewport({ scale: 1 });
-    const s = 520 / v0.width;
-    const v = p.getViewport({ scale: s });
-    c.width = v.width; c.height = v.height;
+    const 밀도 = Math.min(window.devicePixelRatio || 1, 2);
+    const 폭 = (b.clientWidth || 520) * 밀도;
+    const v = p.getViewport({ scale: 폭 / v0.width });
+    c.width = Math.round(v.width); c.height = Math.round(v.height);
     p.render({ canvasContext: c.getContext('2d'), viewport: v });
   }).catch(() => b.remove());
   return b;
@@ -285,12 +317,28 @@ async function 뷰어열기(자) {
 
 async function 쪽그리기() {
   const p = await 문서.getPage(쪽);
-  const 폭 = Math.min(지면.clientWidth - 20, 900);
   const v0 = p.getViewport({ scale: 1 });
-  const v = p.getViewport({ scale: 폭 / v0.width });
-  [cPdf, cInk].forEach(c => { c.width = v.width; c.height = v.height; });
+
+  /* 가로 폭에 맞추되, 가로로 긴 쪽(수업화면)은 화면 높이에도 맞춰 한눈에 들어오게 */
+  let 배 = Math.min(지면.clientWidth - 20, 1400) / v0.width;
+  if (v0.width > v0.height) {
+    배 = Math.min(배, (지면.clientHeight - 20) / v0.height);
+  }
+  const v = p.getViewport({ scale: 배 });
+
+  /* 화면 밀도만큼 크게 그려야 글씨가 또렷합니다 (레티나 대응) */
+  const 밀도 = Math.min(window.devicePixelRatio || 1, 2);
+  const vHi = p.getViewport({ scale: 배 * 밀도 });
+
+  [cPdf, cInk].forEach(c => {
+    c.width = Math.round(vHi.width);
+    c.height = Math.round(vHi.height);
+    c.style.width = v.width + 'px';
+    c.style.height = v.height + 'px';
+  });
   싸개.style.width = v.width + 'px';
-  await p.render({ canvasContext: cPdf.getContext('2d'), viewport: v }).promise;
+  싸개.style.height = v.height + 'px';
+  await p.render({ canvasContext: cPdf.getContext('2d'), viewport: vHi }).promise;
   획들 = 불러오기();
   다시칠하기();
   $('#쪽수').textContent = 쪽 + ' / ' + 총쪽;
@@ -323,14 +371,21 @@ function 좌표(e) {
   const r = cInk.getBoundingClientRect();
   return [(e.clientX - r.left) / r.width, (e.clientY - r.top) / r.height];
 }
+/* 팜 리젝션 — 펜을 한 번이라도 쓰면 그 뒤로는 손가락·손바닥 입력을 무시합니다 */
+let 펜쓰는중 = false;
+const 무시할입력 = e => {
+  if (e.pointerType === 'pen') { 펜쓰는중 = true; return false; }
+  return 펜쓰는중;
+};
+
 cInk.addEventListener('pointerdown', e => {
-  if (!필기중) return;
+  if (!필기중 || 무시할입력(e)) return;
   cInk.setPointerCapture(e.pointerId);
   그리는중 = { 도구, 점: [좌표(e)] };
   획들.push(그리는중);
 });
 cInk.addEventListener('pointermove', e => {
-  if (!그리는중) return;
+  if (!그리는중 || 무시할입력(e)) return;
   그리는중.점.push(좌표(e));
   칠하기(그리는중);
 });
@@ -360,7 +415,9 @@ $('#다음').onclick = () => { if (쪽 < 총쪽) { 쪽++; 쪽그리기(); } };
 $('#닫기').onclick = () => { 뷰.classList.remove('on'); document.body.style.overflow = ''; };
 
 let 늦게;
-addEventListener('resize', () => { clearTimeout(늦게); if (문서) 늦게 = setTimeout(쪽그리기, 250); });
+const 다시그리기예약 = () => { clearTimeout(늦게); if (문서) 늦게 = setTimeout(쪽그리기, 250); };
+addEventListener('resize', 다시그리기예약);
+addEventListener('orientationchange', 다시그리기예약);
 </script>
 </body>
 </html>
