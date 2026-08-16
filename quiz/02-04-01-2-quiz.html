@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#f7f5f0">
+<title>비잔티움 제국 확인 문제</title>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800&family=Nanum+Myeongjo:wght@400;700;800&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:#f7f5f0;color:#23211c;font-family:'Noto Sans KR',system-ui,sans-serif;-webkit-text-size-adjust:100%}
+a{color:oklch(.5 .13 58);text-decoration:none}
+button{font-family:inherit;border:none;background:none;padding:0;color:inherit;cursor:pointer}
+
+#퀴즈{max-width:560px;margin:0 auto;padding:20px 16px 60px}
+
+.뒤로{font:500 12.5px/1 'Noto Sans KR';color:#8b8578;display:inline-flex;align-items:center;gap:3px}
+.뒤로:hover{color:oklch(.5 .13 58)}
+
+.머리{padding:12px 2px 18px;border-bottom:1px solid #eae5da;margin-bottom:18px}
+.제목{font:800 24px/1.3 'Nanum Myeongjo',serif}
+.안내{font:400 13px/1.6 'Noto Sans KR';color:#8b8578;margin-top:8px}
+
+.상태바{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;background:#fffefb;border:1px solid #e6e1d6;border-radius:14px;padding:12px 16px;margin-bottom:18px}
+.요약{font:500 13px/1 'Noto Sans KR';color:#57534a}
+.요약 b{color:oklch(.5 .13 58)}
+.상태버튼들{display:flex;gap:8px}
+.다시버튼{font:500 12.5px/1 'Noto Sans KR';border:1.5px solid #23211c;color:#23211c;border-radius:20px;padding:9px 14px}
+.더버튼{font:500 12.5px/1 'Noto Sans KR';border:1.5px solid oklch(.58 .13 58);color:oklch(.5 .13 58);border-radius:20px;padding:9px 14px}
+.다시버튼[hidden],.더버튼[hidden]{display:none}
+
+.문제카드{background:#fffefb;border:1px solid #e6e1d6;border-radius:16px;padding:18px 16px;margin-bottom:16px}
+
+.문제머리{display:flex;align-items:flex-start;gap:10px}
+.번호{flex:none;width:27px;height:27px;border-radius:50%;background:#23211c;color:#f7f5f0;display:flex;align-items:center;justify-content:center;font:700 12.5px/1 'Nanum Myeongjo',serif;margin-top:1px}
+.지문{flex:1;font:500 15px/1.55 'Noto Sans KR';padding-top:2px}
+
+.제출버튼{display:none;flex:none;opacity:0;transform:scale(.7);transition:opacity .16s,transform .16s;background:oklch(.58 .13 58);color:#fffefb;font:700 12px/1 'Noto Sans KR';border-radius:20px;padding:8px 13px;margin-top:1px}
+.제출버튼.표시{display:inline-flex}
+.제출버튼.보임{opacity:1;transform:scale(1)}
+.제출버튼:hover{background:oklch(.52 .13 58)}
+
+.설명박스{background:#faf7f0;border:1px solid #eae5da;border-radius:10px;padding:12px 14px;margin:12px 0 0;font:400 13.5px/1.65 'Noto Sans KR';color:#3c3a34}
+.설명박스 p{margin:0}
+.설명박스 p+p{margin-top:8px}
+
+.지도래퍼{border:1px solid #e6e1d6;border-radius:12px;overflow:hidden;background:#fffefb;padding:10px;margin:12px 0 0}
+.지도목록{display:grid;gap:8px}
+.지도목록.칸1{grid-template-columns:1fr}
+.지도목록.칸2{grid-template-columns:repeat(2,1fr)}
+.지도목록 figure{margin:0}
+.지도목록 img{width:100%;height:auto;display:block;border-radius:6px;border:1px solid #eae5da}
+.지도목록 figcaption{text-align:center;font:700 11.5px/1 'Noto Sans KR';color:#8b8578;padding-top:6px}
+
+.보기목록{display:flex;flex-direction:column;gap:9px;margin:14px 0 0}
+.보기{position:relative;display:flex;align-items:center;gap:11px;padding:11px 13px;border:1.5px solid #e6e1d6;border-radius:12px;cursor:pointer;transition:border-color .15s,background .15s}
+.보기:hover{border-color:#cfc7b4}
+.보기입력{position:absolute;opacity:0;width:1px;height:1px;overflow:hidden}
+.보기:focus-within{outline:2px solid oklch(.58 .13 58);outline-offset:2px}
+.보기마커{flex:none;font:700 13.5px/1 'Nanum Myeongjo',serif;color:#8b8578;width:18px}
+.보기글{flex:1;font:400 14px/1.5 'Noto Sans KR'}
+.보기.선택됨{border-color:oklch(.58 .13 58);background:oklch(.97 .025 78)}
+.보기.선택됨 .보기마커{color:oklch(.5 .13 58)}
+.보기.정답{border-color:oklch(.55 .12 152);background:oklch(.96 .035 152)}
+.보기.정답::after{content:'✓';margin-left:auto;padding-left:8px;font:800 14px/1 'Noto Sans KR';color:oklch(.42 .13 152)}
+.보기.오답선택{border-color:#b0503a;background:#fbece6}
+.보기.오답선택::after{content:'✕';margin-left:auto;padding-left:8px;font:800 14px/1 'Noto Sans KR';color:#b0503a}
+.보기목록.잠김{pointer-events:none}
+
+.결과영역{margin:14px 0 0;padding-top:14px;border-top:1px dashed #e6e1d6}
+.결과배지{display:inline-block;font:700 11px/1 'Noto Sans KR';padding:6px 11px;border-radius:20px;margin-bottom:10px}
+.결과배지.맞음{background:oklch(.94 .045 152);color:oklch(.38 .12 152)}
+.결과배지.틀림{background:#fbeae6;color:#a83a2e}
+.정답줄{font:500 13.5px/1.5 'Noto Sans KR';margin:0 0 10px;color:#3c3a34}
+.해설{font:400 13.5px/1.75 'Noto Sans KR';color:#57534a;background:#faf8f3;border-radius:10px;padding:12px 14px}
+.해설 b{display:block;color:#23211c;font-weight:700;margin-bottom:5px;font-size:12px;letter-spacing:.02em}
+
+@media (min-width:760px){
+  #퀴즈{max-width:780px;padding:30px 26px 70px}
+  .제목{font-size:30px}
+  .안내{font-size:14.5px}
+  .문제카드{padding:24px 24px}
+  .번호{width:30px;height:30px;font-size:14px}
+  .지문{font-size:16.5px}
+  .설명박스,.지도래퍼,.보기목록,.결과영역{margin-left:41px}
+  .지도목록.칸2{grid-template-columns:repeat(4,1fr)}
+  .보기글{font-size:15px}
+  .해설{font-size:14.5px}
+}
+</style>
+</head>
+<body>
+
+<div id="퀴즈">
+  <a class="뒤로" href="../index.html">‹ 자료실로</a>
+  <div class="머리">
+    <div class="제목">② 비잔티움 제국 · 확인 문제</div>
+    <div class="안내">답을 고르면 번호 왼쪽에 제출 버튼이 나타나고, 제출하면 정답과 해설을 볼 수 있어요. 정답을 2개 골라야 하는 문제도 있어요.</div>
+  </div>
+
+  <div class="상태바">
+    <span class="요약" id="요약">제출 0 / 5</span>
+    <div class="상태버튼들">
+      <button class="다시버튼" id="다시풀기" hidden>다시 풀기</button>
+      <button class="더버튼" id="문제더풀기" hidden>문제 더 풀기</button>
+    </div>
+  </div>
+
+  <div id="문제목록"></div>
+</div>
+
+<script>
+const 동그라미 = ['①','②','③','④','⑤','⑥'];
+
+const 문제전체 = [
+  {
+    지문: "비잔티움 제국에 대한 설명으로 옳지 않은 것은?",
+    보기: [
+      "성 소피아 대성당을 건립하였다.",
+      "콘스탄티노폴리스를 수도로 삼았다.",
+      "카롤루스 대제 때 전성기를 이루었다.",
+      "『유스티니아누스 법전』을 완성하였다.",
+      "그리스의 고전을 연구하고 보존하였다."
+    ],
+    정답: 2,
+    해설: "③은 프랑크 왕국에 대한 설명이다. 비잔티움 제국은 유스티니아누스 황제 때 전성기를 맞이하였다."
+  },
+  {
+    지문: "비잔티움 제국의 역사적 의의 두 가지를 고르면?",
+    보기: [
+      "로마 가톨릭을 발전시켰다.",
+      "동유럽 및 이슬람의 문화 발전에 영향을 주었다.",
+      "교황의 절대적 권력으로 동서 교회를 통일하였다.",
+      "라틴어를 바탕으로 로마의 후계자임을 자처하였다.",
+      "그리스 고전 문화를 보존하여 이탈리아 르네상스의 발생에 기여하였다."
+    ],
+    정답: [1, 4],
+    해설: "비잔티움 제국은 그리스 문화를 보존하였고, 동유럽 문화권 형성에 영향을 주었다."
+  },
+  {
+    지문: "다음과 같은 영토를 확보한 황제에 대한 설명으로 옳지 않은 것은?",
+    지도: [{ 파일: "img/02-04-01-justinian-map.jpg" }],
+    보기: [
+      "유스티니아누스 법전을 편찬하였다.",
+      "비잔티움 제국의 전성기를 이룩하였다.",
+      "옛 로마 제국의 영토를 대부분 회복하였다.",
+      "비잔티움 양식의 성 소피아 성당을 세웠다.",
+      "로마 교황으로부터 서로마 황제의 관을 받았다."
+    ],
+    정답: 4,
+    해설: "제시된 자료는 유스티니아누스 황제가 확보한 비잔티움 제국의 최대 영토를 나타낸 지도이다. ⑤ 프랑크 왕국의 카롤루스 대제에 대한 설명이다."
+  },
+  {
+    지문: "중세 서유럽과 비잔티움 제국을 비교한 내용으로 옳지 않은 것은?",
+    지도: [{ 파일: "img/02-04-01-compare-table.png" }],
+    보기: [
+      "성상 숭배 — 서유럽 인정, 비잔티움 제국 금지",
+      "종교 — 서유럽 로마 가톨릭, 비잔티움 제국 그리스 정교",
+      "정치 — 서유럽 봉건제, 비잔티움 제국 중앙 집권 체제",
+      "건축 양식 — 서유럽 고딕 양식, 비잔티움 제국 비잔티움 양식",
+      "유적 — 서유럽 성 소피아 대성당, 비잔티움 제국 밀라노 대성당"
+    ],
+    정답: 4,
+    해설: "⑤ 밀라노 대성당은 중세 서유럽에서 발달한 고딕 양식의 대표적인 건축물이고, 성 소피아 대성당은 비잔티움 제국에서 발달한 비잔티움 양식의 대표적인 건축물이다."
+  },
+  {
+    지문: "밑줄 친 '이 성당'의 건축 양식에 대한 설명으로 옳은 것은?",
+    설명박스: ["이 성당은 유스티니아누스 황제 때 지어졌다. 여기에는 당시 제국을 대표하는 건축 양식이 사용되었다. 이 성당은 오스만 제국의 지배하에서 이슬람 사원으로 사용되기도 하였다."],
+    지도: [{ 파일: "img/02-04-01-hagia-sophia.jpg" }],
+    보기: [
+      "스테인드글라스를 설치하였다.",
+      "내부를 모자이크 벽화로 장식하였다.",
+      "대승 불교와 함께 동아시아에 전파되었다.",
+      "메카의 방향을 알려 주는 구조물을 두었다.",
+      "기하학적 무늬인 아라베스크를 사용하였다."
+    ],
+    정답: 1,
+    해설: "밑줄 친 '이 성당'은 비잔티움 양식으로 지어진 성 소피아 대성당이다. 비잔티움 양식은 거대한 돔과 내부의 화려한 모자이크 벽화를 특징으로 한다. ① 중세 서유럽의 고딕 양식에 대한 설명이다. ③ 인도의 간다라 양식에 대한 설명이다. ④, ⑤ 이슬람 문화권의 모스크와 관련된 내용이다."
+  }
+];
+
+function 셔플(원본배열) {
+  const a = 원본배열.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+let 문제풀 = [];
+let 표시개수 = 0;
+let 제출됨 = [];
+let 정답수 = 0;
+
+function 문제카드만들기(문제, idx) {
+  const 다중 = Array.isArray(문제.정답);
+  const 카드 = document.createElement('div');
+  카드.className = '문제카드';
+
+  const 머리 = document.createElement('div');
+  머리.className = '문제머리';
+
+  const 제출버튼 = document.createElement('button');
+  제출버튼.className = '제출버튼';
+  제출버튼.type = 'button';
+  제출버튼.textContent = '제출';
+
+  const 번호 = document.createElement('span');
+  번호.className = '번호';
+  번호.textContent = idx + 1;
+
+  const 지문 = document.createElement('div');
+  지문.className = '지문';
+  지문.textContent = 문제.지문;
+
+  머리.append(제출버튼, 번호, 지문);
+  카드.appendChild(머리);
+
+  if (문제.설명박스) {
+    const 박스 = document.createElement('div');
+    박스.className = '설명박스';
+    문제.설명박스.forEach(줄 => {
+      const p = document.createElement('p');
+      p.textContent = 줄;
+      박스.appendChild(p);
+    });
+    카드.appendChild(박스);
+  }
+
+  if (문제.지도 && 문제.지도.length) {
+    const 지도칸 = document.createElement('div');
+    지도칸.className = '지도래퍼';
+    const 목록 = document.createElement('div');
+    목록.className = '지도목록 ' + (문제.지도.length > 1 ? '칸2' : '칸1');
+    문제.지도.forEach(m => {
+      const fig = document.createElement('figure');
+      const img = document.createElement('img');
+      img.src = m.파일;
+      img.alt = m.라벨 ? m.라벨 + ' 자료' : '참고 자료';
+      img.loading = 'lazy';
+      fig.appendChild(img);
+      if (m.라벨) {
+        const cap = document.createElement('figcaption');
+        cap.textContent = m.라벨;
+        fig.appendChild(cap);
+      }
+      목록.appendChild(fig);
+    });
+    지도칸.appendChild(목록);
+    카드.appendChild(지도칸);
+  }
+
+  const 보기목록 = document.createElement('div');
+  보기목록.className = '보기목록';
+  const 보기라벨들 = [];
+
+  문제.보기.forEach((글, i) => {
+    const 라벨 = document.createElement('label');
+    라벨.className = '보기';
+
+    const 입력 = document.createElement('input');
+    입력.type = 다중 ? 'checkbox' : 'radio';
+    입력.name = '문제' + idx;
+    입력.value = i;
+    입력.className = '보기입력';
+
+    const 마커 = document.createElement('span');
+    마커.className = '보기마커';
+    마커.textContent = 동그라미[i];
+
+    const 글칸 = document.createElement('span');
+    글칸.className = '보기글';
+    글칸.textContent = 글;
+
+    라벨.append(입력, 마커, 글칸);
+    보기목록.appendChild(라벨);
+    보기라벨들.push(라벨);
+
+    입력.addEventListener('change', () => {
+      if (다중) {
+        라벨.classList.toggle('선택됨', 입력.checked);
+      } else {
+        보기라벨들.forEach(l => l.classList.remove('선택됨'));
+        라벨.classList.add('선택됨');
+      }
+      const 선택있음 = 보기라벨들.some(l => l.querySelector('input').checked);
+      제출버튼.classList.toggle('표시', 선택있음);
+      if (선택있음) requestAnimationFrame(() => 제출버튼.classList.add('보임'));
+    });
+  });
+  카드.appendChild(보기목록);
+
+  const 결과 = document.createElement('div');
+  결과.className = '결과영역';
+  결과.hidden = true;
+
+  const 배지 = document.createElement('span');
+  배지.className = '결과배지';
+
+  const 정답줄 = document.createElement('p');
+  정답줄.className = '정답줄';
+
+  const 해설칸 = document.createElement('div');
+  해설칸.className = '해설';
+  const 해설제목 = document.createElement('b');
+  해설제목.textContent = '해설';
+  const 해설글 = document.createElement('p');
+  해설글.textContent = 문제.해설;
+  해설글.style.margin = '0';
+  해설칸.append(해설제목, 해설글);
+
+  결과.append(배지, 정답줄, 해설칸);
+  카드.appendChild(결과);
+
+  제출버튼.addEventListener('click', () => {
+    const 고른것 = [];
+    보기라벨들.forEach((l, i) => { if (l.querySelector('input').checked) 고른것.push(i); });
+    if (!고른것.length) return;
+
+    const 정답목록 = (다중 ? 문제.정답.slice() : [문제.정답]).sort((a, b) => a - b);
+    고른것.sort((a, b) => a - b);
+    const 맞음 = 정답목록.length === 고른것.length && 정답목록.every((v, i) => v === 고른것[i]);
+
+    보기라벨들.forEach((l, i) => {
+      l.querySelector('input').disabled = true;
+      if (정답목록.includes(i)) l.classList.add('정답');
+      else if (고른것.includes(i)) l.classList.add('오답선택');
+    });
+    보기목록.classList.add('잠김');
+
+    배지.textContent = 맞음 ? '정답이에요' : '아쉬워요, 오답이에요';
+    배지.className = '결과배지 ' + (맞음 ? '맞음' : '틀림');
+    정답줄.innerHTML = '정답은 ' + 정답목록.map(v => '<b>' + 동그라미[v] + '번</b>').join(', ') + '이에요.';
+    결과.hidden = false;
+    제출버튼.remove();
+
+    if (!제출됨[idx]) {
+      제출됨[idx] = true;
+      if (맞음) 정답수++;
+      요약갱신();
+    }
+  });
+
+  return 카드;
+}
+
+function 문제풀기시작() {
+  문제풀 = 셔플(문제전체);
+  표시개수 = Math.min(5, 문제풀.length);
+  제출됨 = new Array(표시개수).fill(false);
+  정답수 = 0;
+
+  const 목록칸 = document.getElementById('문제목록');
+  목록칸.innerHTML = '';
+  for (let i = 0; i < 표시개수; i++) 목록칸.appendChild(문제카드만들기(문제풀[i], i));
+  요약갱신();
+  scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function 문제더풀기() {
+  const 새표시개수 = Math.min(표시개수 + 5, 문제풀.length);
+  const 목록칸 = document.getElementById('문제목록');
+  for (let i = 표시개수; i < 새표시개수; i++) {
+    제출됨.push(false);
+    목록칸.appendChild(문제카드만들기(문제풀[i], i));
+  }
+  표시개수 = 새표시개수;
+  요약갱신();
+}
+
+function 요약갱신() {
+  const 제출수 = 제출됨.filter(Boolean).length;
+  document.getElementById('요약').innerHTML = '제출 <b>' + 제출수 + '</b> / ' + 표시개수 +
+    (제출수 ? '  ·  정답 <b>' + 정답수 + '</b>개' : '');
+  document.getElementById('다시풀기').hidden = 제출수 === 0;
+  document.getElementById('문제더풀기').hidden = !(제출수 === 표시개수 && 표시개수 < 문제풀.length);
+}
+
+document.getElementById('다시풀기').onclick = 문제풀기시작;
+document.getElementById('문제더풀기').onclick = 문제더풀기;
+
+문제풀기시작();
+</script>
+</body>
+</html>
