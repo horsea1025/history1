@@ -409,9 +409,17 @@ function 자료줄만들기(자) {
   el.querySelector('i').textContent = 자.설명 || 'PDF';
 
   const 단 = document.createElement('button');
+  el.appendChild(단);
+
+  if (자.유형 === '링크') {
+    단.className = '버튼 열기';
+    단.innerHTML = '<em></em>풀기';
+    단.onclick = () => location.href = 자.파일;
+    return el;
+  }
+
   단.className = '버튼 받기';
   단.textContent = '받기';
-  el.appendChild(단);
 
   단.onclick = async () => {
     if (받은파일.has(자.파일)) return 뷰어열기(자);
