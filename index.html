@@ -357,7 +357,7 @@ function 준비중(글 = '자료 준비 중') {
       const 차시들 = 차시목록(소).filter(보임);
       if (!차시들.length) 소속.appendChild(준비중());
 
-      차시들.forEach((차, 차i) => {
+      차시들.forEach(차 => {
         /* ── 차시 ── */
         const 차칸 = document.createElement('div');
         const 차단추 = document.createElement('button');
@@ -381,7 +381,7 @@ function 준비중(글 = '자료 준비 중') {
 
         /* 미리보기는 실제로 펼칠 때 한 번만 만듭니다 (처음 화면이 빨라집니다) */
         let 지었나 = false;
-        접기연결(차단추, 차시속, 차i === 0, () => {
+        접기연결(차단추, 차시속, false, () => {
           if (지었나) return;
           지었나 = true;
           const 자료들 = 차.자료 || [];
