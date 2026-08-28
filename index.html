@@ -22,7 +22,9 @@ button{font-family:inherit;border:none;background:none;padding:0;color:inherit;c
 .공지{background:oklch(.96 .03 78);border:1px solid oklch(.86 .06 74);border-radius:14px;padding:14px 16px;display:flex;gap:11px;align-items:flex-start;margin-bottom:16px}
 .공지 i{width:7px;height:7px;border-radius:50%;background:oklch(.58 .13 58);flex:none;margin-top:7px}
 .공지 b{display:block;font:500 10.5px/1 'Noto Sans KR';color:oklch(.5 .1 58);letter-spacing:.06em}
+.공지줄 b{display:block;font:700 14px/1.6 'Noto Sans KR';color:#23211c;letter-spacing:normal;margin-top:5px}
 .공지 p{margin:5px 0 0;font:500 14px/1.6 'Noto Sans KR'}
+.공지줄 img{display:block;max-width:100%;border-radius:8px;margin:8px 0 2px;border:1px solid oklch(.86 .06 74)}
 .대{border-bottom:1px solid #eae5da}
 .대줄{width:100%;display:flex;align-items:baseline;gap:13px;padding:16px 4px;text-align:left}
 .대번호{font:700 15px/1 'Nanum Myeongjo',serif;color:#b8b1a2;flex:none;min-width:24px}
@@ -112,6 +114,7 @@ body.뷰중 .탭바{display:none}
   .선생{font-size:15px}
   .공지{padding:18px 20px;border-radius:16px}
   .공지 p{font-size:16.5px}
+  .공지줄 b{font-size:15.5px}
   .대줄{padding:20px 6px}
   .대번호{font-size:18px;min-width:30px}
   .대제목{font-size:20px}
@@ -202,20 +205,32 @@ $('#선생').textContent = 수업자료.선생님;
 
 /* ── 공지 (새 공지에는 NEW 표시) ── */
 const 공지들 = (Array.isArray(수업자료.공지) ? 수업자료.공지 : [수업자료.공지])
-  .filter(g => typeof g === 'string' && g.trim());
+  .filter(g => (typeof g === 'string' && g.trim()) || (g && typeof g === 'object' && (g.제목 || g.설명 || g.이미지)));
 
+/* 공지는 글 하나(문자열) 또는 { 제목, 이미지, 설명 } 객체 — 객체는 값으로 비교합니다 */
+const 공지키 = g => JSON.stringify(g);
 function 본공지() {
   try { return JSON.parse(localStorage.getItem('본공지') || '[]'); }
   catch (e) { return []; }
 }
-const 새공지 = () => 공지들.filter(g => !본공지().includes(g));
+const 새공지 = () => {
+  const 본키들 = 본공지().map(공지키);
+  return 공지들.filter(g => !본키들.includes(공지키(g)));
+};
+
+function 뱃지만들기() {
+  const 뱃 = document.createElement('span');
+  뱃.className = '새';
+  뱃.textContent = 'NEW';
+  return 뱃;
+}
 
 function 공지그리기() {
   const 칸 = $('#공지자리');
   칸.innerHTML = '';
   if (!공지들.length) return;
-  const 본 = 본공지();
-  const 새것 = 공지들.filter(g => !본.includes(g));
+  const 본키들 = 본공지().map(공지키);
+  const 새것 = 공지들.filter(g => !본키들.includes(공지키(g)));
 
   const box = document.createElement('div');
   box.className = '공지';
@@ -229,15 +244,37 @@ function 공지그리기() {
   공지들.forEach(g => {
     const 줄 = document.createElement('div');
     줄.className = '공지줄';
-    const p = document.createElement('p');
-    p.textContent = g;
-    줄.appendChild(p);
-    if (!본.includes(g)) {
-      const 뱃 = document.createElement('span');
-      뱃.className = '새';
-      뱃.textContent = 'NEW';
-      p.appendChild(뱃);
+    const 글칸 = document.createElement('div');
+    글칸.style.flex = '1';
+    const 새거 = !본키들.includes(공지키(g));
+
+    if (typeof g === 'string') {
+      const p = document.createElement('p');
+      p.textContent = g;
+      if (새거) p.appendChild(뱃지만들기());
+      글칸.appendChild(p);
+    } else {
+      if (g.제목) {
+        const b = document.createElement('b');
+        b.textContent = g.제목;
+        if (새거) b.appendChild(뱃지만들기());
+        글칸.appendChild(b);
+      }
+      if (g.이미지) {
+        const img = document.createElement('img');
+        img.src = g.이미지;
+        img.alt = '';
+        img.loading = 'lazy';
+        글칸.appendChild(img);
+      }
+      if (g.설명) {
+        const p = document.createElement('p');
+        p.textContent = g.설명;
+        if (새거 && !g.제목) p.appendChild(뱃지만들기());
+        글칸.appendChild(p);
+      }
     }
+    줄.appendChild(글칸);
     속.appendChild(줄);
   });
 
