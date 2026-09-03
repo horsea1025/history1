@@ -24,7 +24,7 @@ button{font-family:inherit;border:none;background:none;padding:0;color:inherit;c
 .공지 b{display:block;font:500 10.5px/1 'Noto Sans KR';color:oklch(.5 .1 58);letter-spacing:.06em}
 .공지줄 b{display:block;font:700 14px/1.6 'Noto Sans KR';color:#23211c;letter-spacing:normal;margin-top:5px}
 .공지 p{margin:5px 0 0;font:500 14px/1.6 'Noto Sans KR'}
-.공지줄 img{display:block;max-width:100%;border-radius:8px;margin:8px 0 2px;border:1px solid oklch(.86 .06 74)}
+.공지줄 img{display:block;width:100%;height:auto;border-radius:8px;margin:8px 0 2px;border:1px solid oklch(.86 .06 74)}
 .대{border-bottom:1px solid #eae5da}
 .대줄{width:100%;display:flex;align-items:baseline;gap:13px;padding:16px 4px;text-align:left}
 .대번호{font:700 15px/1 'Nanum Myeongjo',serif;color:#b8b1a2;flex:none;min-width:24px}
@@ -230,7 +230,6 @@ function 공지그리기() {
   칸.innerHTML = '';
   if (!공지들.length) return;
   const 본키들 = 본공지().map(공지키);
-  const 새것 = 공지들.filter(g => !본키들.includes(공지키(g)));
 
   const box = document.createElement('div');
   box.className = '공지';
@@ -274,21 +273,24 @@ function 공지그리기() {
         글칸.appendChild(p);
       }
     }
+
+    if (새거) {
+      const 단 = document.createElement('button');
+      단.className = '확인';
+      단.textContent = '확인했어요';
+      단.onclick = () => {
+        const 본목록 = 본공지();
+        본목록.push(g);
+        try { localStorage.setItem('본공지', JSON.stringify(본목록)); } catch (e) {}
+        공지그리기();
+        탭표시();
+      };
+      글칸.appendChild(단);
+    }
+
     줄.appendChild(글칸);
     속.appendChild(줄);
   });
-
-  if (새것.length) {
-    const 단 = document.createElement('button');
-    단.className = '확인';
-    단.textContent = '확인했어요';
-    단.onclick = () => {
-      try { localStorage.setItem('본공지', JSON.stringify(공지들)); } catch (e) {}
-      공지그리기();
-      탭표시();
-    };
-    속.appendChild(단);
-  }
 
   box.appendChild(점);
   box.appendChild(속);
