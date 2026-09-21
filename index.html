@@ -55,6 +55,7 @@ img.도형{width:34px;height:34px;border:none;border-radius:0;object-fit:contain
 .중{background:transparent;border:1px solid #e6e1d6;color:#8b8578}
 .열기{border:1.5px solid #23211c;color:#23211c;display:flex;align-items:center;gap:6px}
 .열기 em{width:5px;height:5px;border-radius:50%;background:oklch(.55 .11 152);display:block}
+.예정글{flex:none;max-width:112px;font:400 11px/1.45 'Noto Sans KR';color:#c6bfae;text-align:right}
 .빈{font:400 12.5px/1.6 'Noto Sans KR';color:#c6bfae;padding:20px 4px;text-align:center}
 /* 펼치기·접기 */
 .접기{width:100%;text-align:left;display:flex;align-items:center;gap:9px;padding:7px 0}
@@ -132,6 +133,7 @@ body.뷰중 .탭바{display:none}
   .자료 .이름 b{font-size:16px}
   .자료 .이름 i{font-size:13px}
   .버튼{font-size:13.5px;padding:12px 18px}
+  .예정글{font-size:12.5px;max-width:130px}
   .안내{font-size:14px}
   .필기줄 .글 b{font-size:16px}
   .필기줄 .글 i{font-size:13px}
@@ -452,6 +454,14 @@ function 자료줄만들기(자) {
     '<span class="이름"><b></b><i></i></span>';
   el.querySelector('b').textContent = 자.제목 || '';
   el.querySelector('i').textContent = 자.설명 || 'PDF';
+
+  if (자.유형 === '예정') {
+    const 안내 = document.createElement('span');
+    안내.className = '예정글';
+    안내.textContent = 자.안내 || '준비 중입니다';
+    el.appendChild(안내);
+    return el;
+  }
 
   const 단 = document.createElement('button');
   el.appendChild(단);
