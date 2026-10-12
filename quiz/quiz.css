@@ -2,7 +2,8 @@
 /* 확인 문제 공용 스타일 — 모든 단원 퀴즈 페이지가 함께 씁니다 */
 *{box-sizing:border-box}
 html,body{margin:0}
-body{background:#f7f5f0;color:#23211c;font-family:'Noto Sans KR',system-ui,sans-serif;-webkit-text-size-adjust:100%}
+/* 줄바꿈은 글자 중간이 아니라 띄어쓰기에서만 합니다 (너무 긴 단어만 예외) */
+body{background:#f7f5f0;color:#23211c;font-family:'Noto Sans KR',system-ui,sans-serif;-webkit-text-size-adjust:100%;word-break:keep-all;overflow-wrap:break-word;text-wrap:pretty}
 a{color:oklch(.5 .13 58);text-decoration:none}
 button{font-family:inherit;border:none;background:none;padding:0;color:inherit;cursor:pointer}
 
@@ -12,7 +13,7 @@ button{font-family:inherit;border:none;background:none;padding:0;color:inherit;c
 .뒤로:hover{color:oklch(.5 .13 58)}
 
 .머리{padding:12px 2px 18px;border-bottom:1px solid #eae5da;margin-bottom:18px}
-.제목{font:800 24px/1.3 'Nanum Myeongjo',serif}
+.제목{font:800 24px/1.3 'Nanum Myeongjo',serif;text-wrap:balance}
 .안내{font:400 13px/1.6 'Noto Sans KR';color:#8b8578;margin-top:8px}
 
 /* 문제 풀기 / 오답노트 전환 */
@@ -41,7 +42,7 @@ button{font-family:inherit;border:none;background:none;padding:0;color:inherit;c
 
 .문제머리{display:flex;align-items:flex-start;gap:10px}
 .번호{flex:none;width:27px;height:27px;border-radius:50%;background:#23211c;color:#f7f5f0;display:flex;align-items:center;justify-content:center;font:700 12.5px/1 'Nanum Myeongjo',serif;margin-top:1px}
-.지문{flex:1;font:500 15px/1.55 'Noto Sans KR';padding-top:2px}
+.지문{flex:1;min-width:0;font:500 15px/1.55 'Noto Sans KR';padding-top:2px}
 
 .제출버튼{display:none;flex:none;opacity:0;transform:scale(.7);transition:opacity .16s,transform .16s;background:oklch(.58 .13 58);color:#fffefb;font:700 12px/1 'Noto Sans KR';border-radius:20px;padding:8px 13px;margin-top:1px}
 .제출버튼.표시{display:inline-flex}
@@ -66,7 +67,7 @@ button{font-family:inherit;border:none;background:none;padding:0;color:inherit;c
 .보기입력{position:absolute;opacity:0;width:1px;height:1px;overflow:hidden}
 .보기:focus-within{outline:2px solid oklch(.58 .13 58);outline-offset:2px}
 .보기마커{flex:none;font:700 13.5px/1 'Nanum Myeongjo',serif;color:#8b8578;width:18px}
-.보기글{flex:1;font:400 14px/1.5 'Noto Sans KR'}
+.보기글{flex:1;min-width:0;font:400 14px/1.5 'Noto Sans KR'}
 .보기.선택됨{border-color:oklch(.58 .13 58);background:oklch(.97 .025 78)}
 .보기.선택됨 .보기마커{color:oklch(.5 .13 58)}
 .보기.정답{border-color:oklch(.55 .12 152);background:oklch(.96 .035 152)}
@@ -89,7 +90,7 @@ button{font-family:inherit;border:none;background:none;padding:0;color:inherit;c
 
 /* 오답노트 화면 */
 .노트머리{background:#fffefb;border:1px solid #e6e1d6;border-radius:14px;padding:16px;margin-bottom:16px}
-.노트제목{font:800 18px/1.3 'Nanum Myeongjo',serif}
+.노트제목{font:800 18px/1.3 'Nanum Myeongjo',serif;text-wrap:balance}
 .노트제목 span{font:500 13px/1 'Noto Sans KR';color:#8b8578;margin-left:4px}
 .노트설명{font:400 13px/1.6 'Noto Sans KR';color:#8b8578;margin-top:6px}
 .노트도구{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
