@@ -128,8 +128,11 @@ body.뷰중 .탭바{display:none}
 .크게돌리기{display:none!important;left:calc(8px + var(--안전좌));top:calc(8px + var(--안전상));font-size:18px!important}
 #뷰어.눕힘 .크게돌리기{display:flex!important}
 .크게쪽수{position:absolute;left:50%;bottom:calc(8px + var(--안전하));transform:translateX(-50%);padding:6px 12px;border-radius:14px;background:rgba(35,33,28,.55);color:#f7f5f0;font:500 12px/1 'Noto Sans KR'}
-.크게안내{position:absolute;left:50%;top:calc(10px + var(--안전상));transform:translateX(-50%);max-width:70%;padding:8px 14px;border-radius:14px;background:rgba(35,33,28,.78);color:#f7f5f0;font:500 12.5px/1.4 'Noto Sans KR';text-align:center;transition:opacity .4s;pointer-events:none}
-.크게안내.숨김{opacity:0}
+.크게전체{display:none!important;right:calc(56px + var(--안전우));top:calc(8px + var(--안전상));font-size:17px!important}
+#뷰어.전체지원 .크게전체{display:flex!important}
+.전체켜기{display:none;flex:none;font:500 10.5px/1 'Noto Sans KR';border:1px solid rgba(247,245,240,.35);border-radius:20px;padding:8px 10px}
+.뷰안내{position:absolute;left:50%;top:calc(10px + var(--안전상));transform:translateX(-50%);z-index:6;max-width:80%;padding:8px 14px;border-radius:14px;background:rgba(35,33,28,.8);color:#f7f5f0;font:500 12.5px/1.4 'Noto Sans KR';text-align:center;transition:opacity .4s;pointer-events:none}
+.뷰안내.숨김{opacity:0}
 /* 세로로 든 휴대폰(회전 잠금을 켜 둔 경우)에서도 화면을 옆으로 눕혀 가로처럼 봅니다 */
 #뷰어.눕힘{inset:auto;left:0;top:0;width:var(--뷰폭);height:var(--뷰높이);transform-origin:0 0;transform:translateX(var(--뷰높이)) rotate(90deg);--안전상:env(safe-area-inset-right);--안전우:env(safe-area-inset-bottom);--안전하:env(safe-area-inset-left);--안전좌:env(safe-area-inset-top)}
 #뷰어.눕힘.반대{transform:translateY(var(--뷰폭)) rotate(-90deg);--안전상:env(safe-area-inset-left);--안전우:env(safe-area-inset-top);--안전하:env(safe-area-inset-right);--안전좌:env(safe-area-inset-bottom)}
@@ -167,7 +170,8 @@ body.뷰중 .탭바{display:none}
   .탭 b{font-size:20px}
   .뷰제목 b{font-size:17px}
   .뷰제목 i{font-size:12.5px}
-  .필기토글{font-size:13px;padding:11px 15px}
+  .필기토글,.크게켜기,.전체켜기{font-size:13px;padding:11px 15px}
+  #뷰어.전체지원 .전체켜기{display:block}
   .도구 button{width:52px;height:52px;font-size:13px}
   .쪽{font-size:14px}
   .쪽 button{width:44px;height:44px}
@@ -177,7 +181,8 @@ body.뷰중 .탭바{display:none}
   .뷰머리{padding:calc(5px + env(safe-area-inset-top)) calc(12px + env(safe-area-inset-right)) 5px calc(12px + env(safe-area-inset-left))}
   .뷰제목 b{font-size:13px}
   .뷰제목 i{display:none}
-  .필기토글,.크게켜기{font-size:10.5px;padding:7px 10px}
+  .필기토글,.크게켜기,.전체켜기{font-size:10.5px;padding:7px 10px}
+  #뷰어.전체지원 .전체켜기{display:block}
   #지면{padding:6px}
   .도구{padding:5px calc(12px + env(safe-area-inset-right)) calc(5px + env(safe-area-inset-bottom)) calc(12px + env(safe-area-inset-left))}
   .도구 button{width:36px;height:34px;font-size:11px}
@@ -210,6 +215,7 @@ body.뷰중 .탭바{display:none}
   <div class="뷰머리">
     <button class="뒤로" id="닫기">‹</button>
     <div class="뷰제목"><b id="뷰제목"></b><i id="뷰상태">읽기 중 · 넘겨서 보기</i></div>
+    <button class="전체켜기" id="전체켜기">전체 화면</button>
     <button class="크게켜기" id="크게켜기">가로 보기</button>
     <button class="필기토글" id="필기토글">필기 끔</button>
   </div>
@@ -223,12 +229,13 @@ body.뷰중 .탭바{display:none}
   </div>
   <div class="크게바">
     <button class="크게나가기" id="크게나가기" aria-label="보통 화면으로 돌아가기">✕</button>
+    <button class="크게전체" id="크게전체" aria-label="전체 화면 켜기·끄기">⛶</button>
     <button class="크게돌리기" id="크게돌리기" aria-label="화면 방향 바꾸기">↻</button>
     <button class="크게이전" id="크게이전" aria-label="이전 쪽">‹</button>
     <button class="크게다음" id="크게다음" aria-label="다음 쪽">›</button>
     <span class="크게쪽수" id="크게쪽수">1 / 1</span>
-    <span class="크게안내 숨김" id="크게안내"></span>
   </div>
+  <span class="뷰안내 숨김" id="뷰안내"></span>
 </div>
 
 <script src="자료목록.js"></script>
@@ -568,7 +575,86 @@ let 쪽가로형 = false, 크게켬 = false, 이전방향 = null, 눕힘반대 =
 const 뷰 = $('#뷰어'), 지면 = $('#지면'), 싸개 = $('#싸개');
 const cPdf = $('#지면canvas'), cInk = $('#필기canvas'), gInk = cInk.getContext('2d');
 
+/* ── 전체 화면 — 가로로 눕힌 휴대폰에서 주소창·상태바를 숨깁니다 ──
+   브라우저 규칙상 전체 화면은 화면을 '터치한 순간'에만 켤 수 있습니다.
+   그래서 눕힌 채로 '열기'를 누를 때, 또는 눕힌 뒤 처음 터치할 때 켭니다. (아이폰 사파리는 전체 화면 기능이 없습니다) */
+let 전체대기해제 = null, 내가켠전체 = false, 전체사용자끔 = false, 우리가끔 = false, 전체요청시각 = 0;
+const 터치기기 = () => matchMedia('(hover: none) and (pointer: coarse)').matches;
+const 전체가능 = () => !!(document.fullscreenEnabled || document.webkitFullscreenEnabled);
+const 전체중 = () => !!(document.fullscreenElement || document.webkitFullscreenElement);
+const 지금짧은가로 = () => innerWidth > innerHeight && innerHeight <= 540;   // 가로로 눕힌 휴대폰
+const 전체지원맞추기 = () => 뷰.classList.toggle('전체지원', 전체가능());
+전체지원맞추기();
+
+let 안내끄기, 대기안내 = false;
+function 안내(글, 밀리초 = 4000, 대기용 = false) {
+  const el = $('#뷰안내');
+  el.textContent = 글;
+  el.classList.remove('숨김');
+  clearTimeout(안내끄기);
+  안내끄기 = setTimeout(() => el.classList.add('숨김'), 밀리초);
+  대기안내 = 대기용;
+}
+/* '한 번 터치하세요' 안내는 전체 화면이 켜지거나 필요 없어지면 바로 거둡니다 */
+function 대기안내걷기() {
+  if (!대기안내) return;
+  대기안내 = false;
+  clearTimeout(안내끄기);
+  $('#뷰안내').classList.add('숨김');
+}
+
+function 전체켜기() {
+  if (!전체가능() || 전체중() || Date.now() - 전체요청시각 < 800) return;
+  전체요청시각 = Date.now();
+  const el = document.documentElement;
+  const 요청 = el.requestFullscreen || el.webkitRequestFullscreen;
+  try {
+    const 약속 = 요청.call(el, { navigationUI: 'hide' });
+    if (약속 && 약속.then) 약속.then(() => { 내가켠전체 = true; }, () => {});
+    else 내가켠전체 = true;
+  } catch (e) {}
+}
+function 전체끄기() {
+  if (!전체중()) return;
+  우리가끔 = true;
+  const 종료 = document.exitFullscreen || document.webkitExitFullscreen;
+  try { const 약속 = 종료.call(document); if (약속 && 약속.catch) 약속.catch(() => {}); } catch (e) {}
+}
+function 전체바뀜() {
+  const 중 = 전체중();
+  뷰.classList.toggle('전체', 중);
+  $('#전체켜기').textContent = 중 ? '전체 해제' : '전체 화면';
+  if (중) { 내가켠전체 = true; 전체사용자끔 = false; 대기안내걷기(); return; }
+  /* 사용자가 직접 나간 경우에는 휴대폰을 다시 돌리기 전까지 자동으로 켜지 않습니다 */
+  if (!우리가끔 && 뷰.classList.contains('on') && 지금짧은가로()) 전체사용자끔 = true;
+  우리가끔 = false; 내가켠전체 = false;
+}
+document.addEventListener('fullscreenchange', 전체바뀜);
+document.addEventListener('webkitfullscreenchange', 전체바뀜);
+
+/* 눕힌 뒤 처음 터치하는 순간 전체 화면을 켭니다 (방금 터치했다면 바로 켭니다) */
+function 전체대기걸기() {
+  if (전체대기해제 || 전체중() || !전체가능() || 전체사용자끔 || !터치기기()) return;
+  if (navigator.userActivation && navigator.userActivation.isActive) { 전체켜기(); return; }
+  const 이름들 = ['pointerup', 'touchend', 'click'];
+  const 시도 = () => {
+    전체대기해제();
+    if (뷰.classList.contains('on') && 지금짧은가로()) 전체켜기();
+  };
+  전체대기해제 = () => { 이름들.forEach(n => document.removeEventListener(n, 시도, true)); 전체대기해제 = null; };
+  이름들.forEach(n => document.addEventListener(n, 시도, true));
+  안내('화면을 한 번 터치하면 전체 화면으로 바뀝니다', 5000, true);
+}
+
+/* 아이폰 사파리에는 전체 화면 기능이 없어서, 주소창을 숨기는 방법을 한 번만 알려 줍니다 */
+function 아이폰안내() {
+  if (전체가능() || !/iPhone|iPod/.test(navigator.userAgent) || navigator.standalone) return;
+  try { if (localStorage.getItem('가로팁')) return; localStorage.setItem('가로팁', '1'); } catch (e) { return; }
+  안내('주소창을 숨기려면 주소창 왼쪽의 ‘aA’ → ‘도구 막대 가리기’를 눌러 보세요', 8000);
+}
+
 async function 뷰어열기(자, 시작쪽) {
+  if (터치기기() && 지금짧은가로()) 전체켜기();   // 눕힌 채로 '열기'를 누른 순간(터치)에 바로 전체 화면
   뷰.classList.add('on');
   document.body.classList.add('뷰중');
   document.body.style.overflow = 'hidden';
@@ -591,6 +677,9 @@ function 보기모양맞추기() {
   if (짧은가로 !== 이전방향) {                     // 처음 열었거나, 휴대폰을 눕히거나 세운 순간
     이전방향 = 짧은가로;
     크게켬 = 짧은가로 && 쪽가로형;                  // 눕히면 크게, 세우면 보통 화면
+    전체사용자끔 = false;
+    if (짧은가로) { 전체대기걸기(); 아이폰안내(); }          // 눕히면 전체 화면 준비
+    else { if (전체대기해제) 전체대기해제(); 대기안내걷기(); if (내가켠전체) 전체끄기(); }   // 세우면 전체 화면 끝
   }
   const 크게 = 크게켬 && 쪽가로형;
   const 눕힘 = 크게 && 세로;                       // 세로로 든 채 크게 보기 → 화면을 옆으로 눕혀서 보여 줌
@@ -712,29 +801,24 @@ $('#이전').onclick = 이전쪽;
 $('#다음').onclick = 다음쪽;
 
 /* ── 크게 보기 조작 ── */
-let 안내끄기;
-function 크게안내(글) {
-  const el = $('#크게안내');
-  el.textContent = 글;
-  el.classList.remove('숨김');
-  clearTimeout(안내끄기);
-  안내끄기 = setTimeout(() => el.classList.add('숨김'), 4000);
-}
 const 눕히는말 = () => '휴대폰을 ' + (눕힘반대 ? '오른쪽' : '왼쪽') + '으로 눕혀서 보세요';
 
 $('#크게켜기').onclick = () => {
   크게켬 = true;
   보기모양맞추기();
-  if (뷰.classList.contains('눕힘')) 크게안내(눕히는말());
+  if (뷰.classList.contains('눕힘')) { 안내(눕히는말()); 전체켜기(); }   // 회전 잠금을 켠 세로 화면에서도 주소창 없이 보이도록
   쪽그리기();
 };
-$('#크게나가기').onclick = () => { 크게켬 = false; 보기모양맞추기(); 쪽그리기(); };
+$('#크게나가기').onclick = () => { 크게켬 = false; 전체사용자끔 = true; 전체끄기(); 보기모양맞추기(); 쪽그리기(); };
 $('#크게돌리기').onclick = () => {
   눕힘반대 = !눕힘반대;
   보기모양맞추기();
-  크게안내(눕히는말());
+  안내(눕히는말());
   쪽그리기();
 };
+const 전체바꾸기 = () => { if (전체중()) { 전체사용자끔 = true; 전체끄기(); } else { 전체사용자끔 = false; 전체켜기(); } };
+$('#전체켜기').onclick = 전체바꾸기;
+$('#크게전체').onclick = 전체바꾸기;
 $('#크게이전').onclick = 이전쪽;
 $('#크게다음').onclick = 다음쪽;
 
@@ -764,6 +848,10 @@ addEventListener('keydown', e => {
 $('#닫기').onclick = () => {
   뷰.classList.remove('on', '크게', '눕힘', '반대', '가로쪽');
   크게켬 = false; 이전방향 = null;
+  if (전체대기해제) 전체대기해제();
+  대기안내걷기();
+  전체사용자끔 = false;
+  if (내가켠전체) 전체끄기();
   document.body.classList.remove('뷰중');
   document.body.style.overflow = '';
   if (지금화면 === '필기') 필기그리기();
